@@ -690,6 +690,8 @@ select,input{font-family:inherit;font:inherit;font-size:13px;padding:6px 8px;bor
 .muted{color:#6b4f5c}
 #map{height:100%;width:100%}
 .foot{font-size:14px;color:#6b4f5c;margin:10px 2px 20px;line-height:1.45}
+.totop{position:fixed;right:16px;bottom:16px;z-index:1000;display:none;background:#c2577f;color:#fff;border:0;border-radius:999px;padding:10px 16px;font:inherit;font-size:14px;box-shadow:0 2px 8px #0003;cursor:pointer}
+.totop.show{display:block}
 </style></head>
 <body>
 <header>
@@ -717,6 +719,7 @@ select,input{font-family:inherit;font:inherit;font-size:13px;padding:6px 8px;bor
   </div>
   <div id="map"></div>
 </div>
+<button class="totop" id="toTop" aria-label="Back to top">Back to top</button>
 <script>/* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
  * (c) 2010-2023 Vladimir Agafonkin, (c) 2010-2011 CloudMade
@@ -807,12 +810,16 @@ function refresh(){
   drawMarkers();
   document.getElementById('hotelLabel').textContent = 'Hotel: ' + HOTEL.label;
 }
-function selectCard(id){
+function selectCard(id, fromList){
   active = id;
   renderList();
   const r = DATA.find(x=>x.id===id);
-  map.setView([r.lat,r.lng],16);
+  map.invalidateSize();
+  map.setView([r.lat,r.lng],17);
   if(markers[id]) markers[id].openPopup();
+  if(fromList && window.innerWidth<=800){
+    document.getElementById('map').scrollIntoView({behavior:'smooth',block:'start'});
+  }
   const el = document.querySelector(`.card[data-id="${id}"]`);
   if(el) el.scrollIntoView({block:'nearest'});
 }
@@ -827,7 +834,7 @@ document.getElementById('cats').addEventListener('click',e=>{
 });
 document.getElementById('list').addEventListener('click',e=>{
   if(e.target.closest('a')) return;
-  const c = e.target.closest('.card'); if(c) selectCard(+c.dataset.id);
+  const c = e.target.closest('.card'); if(c) selectCard(+c.dataset.id, true);
 });
 document.getElementById('sort').addEventListener('change',e=>{sort=e.target.value; renderList();});
 document.getElementById('setHotel').addEventListener('click',()=>{
@@ -838,6 +845,15 @@ document.getElementById('setHotel').addEventListener('click',()=>{
   } else {
     alert('Enter coordinates as: latitude, longitude (for example -8.8200, 115.1100)');
   }
+});
+
+const side = document.querySelector('.side'), toTop = document.getElementById('toTop');
+function syncTop(){ const y = Math.max(window.scrollY, side.scrollTop); toTop.classList.toggle('show', y > 300); }
+window.addEventListener('scroll', syncTop, {passive:true});
+side.addEventListener('scroll', syncTop, {passive:true});
+toTop.addEventListener('click', ()=>{
+  window.scrollTo({top:0, behavior:'smooth'});
+  side.scrollTo({top:0, behavior:'smooth'});
 });
 
 refresh();
