@@ -696,11 +696,6 @@ select,input{font-family:inherit;font:inherit;font-size:13px;padding:6px 8px;bor
 <body>
 <header>
   <h1>DP's Uluwatu Map</h1>
-  <div class="controls">
-    <label style="font-size:13px">Hotel coordinates (lat, lng)
-      <input id="hotelIn" size="22" placeholder="-8.8200, 115.1100"></label>
-    <button class="chip" id="setHotel">Update distances</button>
-  </div>
 </header>
 <div class="wrap">
   <div class="side">
@@ -837,15 +832,6 @@ document.getElementById('list').addEventListener('click',e=>{
   const c = e.target.closest('.card'); if(c) selectCard(+c.dataset.id, true);
 });
 document.getElementById('sort').addEventListener('change',e=>{sort=e.target.value; renderList();});
-document.getElementById('setHotel').addEventListener('click',()=>{
-  const p = document.getElementById('hotelIn').value.split(',').map(s=>parseFloat(s.trim()));
-  if(p.length===2 && p.every(Number.isFinite)){
-    HOTEL = {lat:p[0], lng:p[1], label:'your coordinates ('+p[0]+', '+p[1]+')'};
-    refresh(); fitAll();
-  } else {
-    alert('Enter coordinates as: latitude, longitude (for example -8.8200, 115.1100)');
-  }
-});
 
 const side = document.querySelector('.side'), toTop = document.getElementById('toTop');
 function syncTop(){ const y = Math.max(window.scrollY, side.scrollTop); toTop.classList.toggle('show', y > 300); }
